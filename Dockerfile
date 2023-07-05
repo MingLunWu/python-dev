@@ -36,7 +36,25 @@ RUN make altinstall
 
 WORKDIR /tmp
 RUN rm -rf Python-3.6.6/ Python-3.7.5/ Python-3.8.6/ Python-3.6.6.tgz Python-3.7.5.tgz Python-3.8.6.tgz
-WORKDIR /
+
+# VSCode Container
+WORKDIR /tmp
+RUN wget https://update.code.visualstudio.com/commit:441438abd1ac652551dbe4d408dfcec8a499b8bf/server-linux-x64/stable
+RUN tar xvf stable
+RUN mkdir -p /root/.vscode-server/bin/
+RUN cp -r vscode-server-linux-x64 /root/.vscode-server/bin/441438abd1ac652551dbe4d408dfcec8a499b8bf
+RUN rm -rf stable vscode-server-linux-x64/
+
+# Oh-my-zsh
+RUN yum -y install zsh
+RUN chsh -s /usr/bin/zsh root
+RUN su
+RUN wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh
+COPY .zshrc /root/.zshrc
+RUN git clone https://github.com/bhilburn/powerlevel9k.git /root/.oh-my-zsh/custom/themes/powerlevel9k
+RUN git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+RUN git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+WORKDIR /root
 
 # Pip package
 RUN pip3.8 install poetry && poetry config virtualenvs.in-project true
