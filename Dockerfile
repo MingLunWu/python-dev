@@ -6,9 +6,16 @@ RUN yum -y install epel-release
 RUN yum -y update
 
 RUN yum -y groupinstall "Development Tools"
-RUN yum -y install openssl-devel bzip2-devel libffi-devel xz-devel
+RUN yum -y install openssl-devel bzip2-devel libffi-devel xz-devel sqlite-devel
 
 RUN yum -y install wget yq jq
+
+RUN yum -y remove git
+RUN yum -y remove git-*
+
+RUN yum -y install https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo.x86_64.rpm
+RUN yum -y install git
+
 
 # Python 3.8.6
 WORKDIR /tmp
@@ -58,5 +65,10 @@ WORKDIR /root
 
 # Pip package
 RUN pip3.8 install poetry && poetry config virtualenvs.in-project true
+RUN pip3.8 install docker-compose
+
+# Install docker
+RUN yum install -y yum-utils docker
+RUN yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 
 CMD ["sleep", "infinity"]
