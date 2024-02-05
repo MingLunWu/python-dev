@@ -8,9 +8,26 @@ RUN yum -y install epel-release && \
     yum -y update && \
     yum -y groupinstall "Development Tools" && \
     yum -y install https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo.x86_64.rpm && \
-    yum -y install openssl-devel bzip2-devel libffi-devel xz-devel sqlite-devel wget yq jq git
+    yum -y install openssl-devel bzip2-devel libffi-devel xz-devel sqlite-devel wget yq jq git && \
+    yum -y install postgresql-devel
 
 FROM base_stage as python_stage
+
+# Python 3.11.5
+WORKDIR /tmp
+RUN wget https://www.python.org/ftp/python/3.11.5/Python-3.11.5.tgz && \
+    tar xvf Python-3.11.5.tgz
+WORKDIR /tmp/Python-3.11.5
+RUN ./configure --enable-optimizations && \
+    make altinstall
+
+# Python 3.9.18
+WORKDIR /tmp
+RUN wget https://www.python.org/ftp/python/3.8.6/Python-3.9.18.tgz && \
+    tar xvf Python-3.9.18.tgz
+WORKDIR /tmp/Python-3.9.18
+RUN ./configure --enable-optimizations && \
+    make altinstall
 
 # Python 3.8.6
 WORKDIR /tmp
