@@ -48,7 +48,9 @@ RUN ./configure --enable-optimizations && \
 WORKDIR /tmp
 RUN wget https://bootstrap.pypa.io/get-pip.py && \
     python3.7 get-pip.py && \
-    python3.8 get-pip.py
+    python3.8 get-pip.py && \
+    python3.9 get-pip.py && \
+    python3.11 get-pip.py
 
 # VSCode Container
 FROM python_stage as tools_stage
@@ -71,7 +73,9 @@ RUN git clone https://github.com/bhilburn/powerlevel9k.git /root/.oh-my-zsh/cust
     git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 
 # Pip package
-RUN pip3.8 install docker-compose && \
+RUN pip3.11 install docker-compose && \
+    pip3.9 install docker-compose && \
+    pip3.8 install docker-compose && \
     pip3.7 install docker-compose
 
 # Install docker
