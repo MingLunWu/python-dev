@@ -8,9 +8,28 @@ RUN yum -y install epel-release && \
     yum -y update && \
     yum -y groupinstall "Development Tools" && \
     yum -y install https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo.x86_64.rpm && \
-    yum -y install openssl-devel bzip2-devel libffi-devel xz-devel sqlite-devel wget yq jq git
+    yum -y install openssl-devel openssl11 openssl11-devel bzip2-devel libffi-devel xz-devel sqlite-devel wget yq jq git && \
+    yum -y install postgresql-devel
 
 FROM base_stage as python_stage
+
+# Python 3.11.5
+WORKDIR /tmp
+RUN wget https://www.python.org/ftp/python/3.11.5/Python-3.11.5.tgz && \
+    tar xvf Python-3.11.5.tgz
+WORKDIR /tmp/Python-3.11.5
+RUN export CFLAGS=$(pkg-config --cflags openssl11) && \
+    export LDFLAGS=$(pkg-config --libs openssl11) && \
+    ./configure && \
+    make altinstall
+
+# Python 3.9.18
+WORKDIR /tmp
+RUN wget https://www.python.org/ftp/python/3.8.6/Python-3.9.18.tgz && \
+    tar xvf Python-3.9.18.tgz
+WORKDIR /tmp/Python-3.9.18
+RUN ./configure --enable-optimizations && \
+    make altinstall
 
 # Python 3.8.6
 WORKDIR /tmp
@@ -31,7 +50,9 @@ RUN ./configure --enable-optimizations && \
 WORKDIR /tmp
 RUN wget https://bootstrap.pypa.io/get-pip.py && \
     python3.7 get-pip.py && \
-    python3.8 get-pip.py
+    python3.8 get-pip.py && \
+    python3.9 get-pip.py && \
+    python3.11 get-pip.py
 
 # VSCode Container
 FROM python_stage as tools_stage
@@ -54,7 +75,9 @@ RUN git clone https://github.com/bhilburn/powerlevel9k.git /root/.oh-my-zsh/cust
     git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 
 # Pip package
-RUN pip3.8 install docker-compose && \
+RUN pip3.11 install --no-build-isolation docker-compose && \
+    pip3.9 install docker-compose && \
+    pip3.8 install docker-compose && \
     pip3.7 install docker-compose
 
 # Install docker
