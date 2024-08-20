@@ -1,4 +1,4 @@
-FROM centos:7 as base_stage
+FROM centos:8 as base_stage
 
 USER root
 
@@ -7,28 +7,20 @@ RUN yum -y remove git git-*
 RUN yum -y install epel-release && \
     yum -y update && \
     yum -y groupinstall "Development Tools" && \
-    yum -y install https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo.x86_64.rpm && \
+    # yum -y install https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo.x86_64.rpm && \
     yum -y install openssl-devel openssl11 openssl11-devel bzip2-devel libffi-devel xz-devel sqlite-devel wget yq jq git && \
     yum -y install postgresql-devel
 
 FROM base_stage as python_stage
 
-# Python 3.11.5
+# Python 3.11.7
 WORKDIR /tmp
-RUN wget https://www.python.org/ftp/python/3.11.5/Python-3.11.5.tgz && \
-    tar xvf Python-3.11.5.tgz
-WORKDIR /tmp/Python-3.11.5
+RUN wget https://www.python.org/ftp/python/3.11.7/Python-3.11.7.tgz && \
+    tar xvf Python-3.11.7.tgz
+WORKDIR /tmp/Python-3.11.7
 RUN export CFLAGS=$(pkg-config --cflags openssl11) && \
     export LDFLAGS=$(pkg-config --libs openssl11) && \
     ./configure && \
-    make altinstall
-
-# Python 3.9.18
-WORKDIR /tmp
-RUN wget https://www.python.org/ftp/python/3.8.6/Python-3.9.18.tgz && \
-    tar xvf Python-3.9.18.tgz
-WORKDIR /tmp/Python-3.9.18
-RUN ./configure --enable-optimizations && \
     make altinstall
 
 # Python 3.8.6
@@ -61,6 +53,11 @@ RUN wget https://update.code.visualstudio.com/commit:441438abd1ac652551dbe4d408d
     tar xvf stable && \
     mkdir -p /root/.vscode-server/bin/ && \
     cp -r vscode-server-linux-x64 /root/.vscode-server/bin/441438abd1ac652551dbe4d408dfcec8a499b8bf && \
+    rm -rf stable vscode-server-linux-x64/ && \
+    wget https://update.code.visualstudio.com/commit:fee1edb8d6d72a0ddff41e5f71a671c23ed924b9/server-linux-x64/stable && \
+    tar xvf stable && \
+    mkdir -p /root/.vscode-server/bin/ && \
+    cp -r vscode-server-linux-x64 /root/.vscode-server/bin/fee1edb8d6d72a0ddff41e5f71a671c23ed924b9 && \
     rm -rf stable vscode-server-linux-x64/
 
 # Oh-my-zsh
