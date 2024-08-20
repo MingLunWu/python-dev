@@ -1,16 +1,10 @@
-FROM centos:8 as base_stage
+FROM redhat/ubi8:8.5 AS base_stage
 
-USER root
+RUN yum update -y && \
+    yum groupinstall -y "Development Tools" && \
+    yum install -y wget bzip2 make gcc zlib-devel openssl-devel libffi-devel
 
-RUN yum -y remove git git-*
-
-RUN yum -y install epel-release && \
-    yum -y update && \
-    yum -y groupinstall "Development Tools" && \
-    yum -y install openssl-devel openssl11 openssl11-devel bzip2-devel libffi-devel xz-devel sqlite-devel wget yq jq git && \
-    yum -y install postgresql-devel
-
-FROM base_stage as python_stage
+FROM base_stage AS python_stage
 
 # Python 3.11.7
 WORKDIR /tmp
@@ -42,11 +36,12 @@ WORKDIR /tmp
 RUN wget https://bootstrap.pypa.io/get-pip.py && \
     python3.7 get-pip.py && \
     python3.8 get-pip.py && \
-    python3.9 get-pip.py && \
     python3.11 get-pip.py
 
 # VSCode Container
-FROM python_stage as tools_stage
+# FROM python_stage as tools_stage
+FROM centos:8 AS tmp_stage
+USER root
 WORKDIR /tmp
 RUN wget https://update.code.visualstudio.com/commit:441438abd1ac652551dbe4d408dfcec8a499b8bf/server-linux-x64/stable && \
     tar xvf stable && \
