@@ -7,7 +7,6 @@ RUN yum -y remove git git-*
 RUN yum -y install epel-release && \
     yum -y update && \
     yum -y groupinstall "Development Tools" && \
-    # yum -y install https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo.x86_64.rpm && \
     yum -y install openssl-devel openssl11 openssl11-devel bzip2-devel libffi-devel xz-devel sqlite-devel wget yq jq git && \
     yum -y install postgresql-devel
 
