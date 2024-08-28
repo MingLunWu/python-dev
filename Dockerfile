@@ -2,7 +2,7 @@ FROM almalinux:8 AS base_stage
 
 RUN yum update -y && \
     yum groupinstall -y "Development Tools" && \
-    yum install -y sqlite-devel wget bzip2 make gcc zlib-devel openssl-devel libffi-devel
+    yum install -y bzip2-devel readline-devel tk-devel gdbm-devel sqlite-devel wget bzip2 make gcc zlib-devel openssl-devel libffi-devel
 
 FROM base_stage AS python_stage
 
